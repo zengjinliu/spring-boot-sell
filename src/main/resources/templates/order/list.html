@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>卖家商品</title>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/3.0.1/css/bootstrap.min.css" rel="stylesheet">
+    <link ref="stylesheet" th:href="@{/sell/css/style.css}" href="/sell/css/style.css"/>
+</head>
+<body>
+
+<!--引入侧边栏 sidebar-->
+<!--<div th:include="coms/bar::sidebar"></div>-->
+
+<!--主体内容-->
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>订单id</th>
+                    <th>姓名</th>
+                    <th>手机号</th>
+                    <th>地址</th>
+                    <th>金额</th>
+                    <th>订单状态</th>
+                    <th>支付状态</th>
+                    <th>创建时间</th>
+                    <th>跟新时间</th>
+                    <th colspan="2">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="orders:${orderDTOPage}">
+                    <td th:text="${orders.orderId}">1</td>
+                    <td th:text="${orders.buyerName}">TB</td>
+                    <td th:text="${orders.buyerPhone}">fa</td>
+                    <td th:text="${orders.buyerAddress}">D</td>
+                    <td th:text="${orders.orderAmount}">D</td>
+                    <td th:text="${orders.getOrderStatusEnum().getMsg()}">D</td>
+                    <td th:text="${orders.getPayStatusEnum().getMsg()}">D</td>
+                    <td th:text="${orders.creatTime}">D</td>
+                    <td th:text="${orders.updateTime}">D</td>
+                    <td><a href="#" th:href="@{'/seller/order/detail'(orderId=${orders.getOrderId()})}">详情</a></td>
+                    <td><a th:text="${orders.getOrderStatus()==2?'':'取消'}"
+                           th:href="@{'/seller/order/cancel'(orderId=${orders.getOrderId()})}" href="#">取消</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-12 column">
+            <!--分页-->
+            <ul class="pagination pull-right">
+                <li th:class="${page==1}?'hidden' : ''"><a th:href="@{'/seller/order/list?page=' + ${page-1}} ">上一页</a>
+                </li>
+                <li th:if="${page-3 >=1}"><a th:href="@{'/seller/order/list?page=' + ${page-3}}"
+                                             th:text="${page -3}">1</a></li>
+                <li th:if="${page-2 >=1}"><a th:href="@{'/seller/order/list?page=' + ${page-2}}"
+                                             th:text="${page -2}">1</a></li>
+                <li th:if="${page-1 >=1}"><a th:href="@{'/seller/order/list?page=' + ${page-1}}"
+                                             th:text="${page -1}">1</a></li>
+                <li class="active"><a href="#" th:text="${page}">1</a></li>
+                <li th:if="${page+1 <=orderDTOPage.getTotalPages()}"><a
+                        th:href="@{'/seller/order/list?page=' + ${page+1}}" th:text="${page +1}">1</a></li>
+                <li th:if="${page+2 <=orderDTOPage.getTotalPages()}"><a
+                        th:href="@{'/seller/order/list?page=' + ${page+2}}" th:text="${page +2}">1</a></li>
+                <li th:if="${page+3 <=orderDTOPage.getTotalPages()}"><a
+                        th:href="@{'/seller/order/list?page=' + ${page+3}}" th:text="${page +3}">1</a></li>
+                <li th:class="${page==orderDTOPage.getTotalPages()}?'hidden':''"><a
+                        th:href="@{'/seller/order/list?page=' + ${page+1}}">下一页</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="myModal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">
+                    提示
+                </h4>
+            </div>
+            <div class="modal-body">
+                您有新的订单了
+            </div>
+            <div class="modal-footer">
+                <button onclick="javascript:document.getElementById('notice').pause();" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button onclick="location.reload()" type="button" class="btn btn-primary">查看新订单</button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!--播放音乐-->
+<audio id="notice" loop="loop">
+    <source src="/sell/mp3/song.mp3" type="audio/mpeg"/>
+</audio>
+
+
+<!--websocket实现前后端通信-->
+<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.0.1/bootstrap.min.js"></script>
+<script th:inline="javascript">
+    var websocket = null;
+    if ('websocket' in window) {
+        websocket = new WebSocket('ws://localhost:8080/sell/webSocket');
+    } else {
+        console.log('该浏览器不支持websocket');
+    }
+    websocket.onopen = function(event){
+        console.log("建立连接");
+    }
+    websocket.onclose = function(event){
+        console.log('关闭连接');
+    }
+
+    websocket.onmessage = function (event) {
+        console.log('接到消息:' + event.data);
+        //接到消息播放音乐，或者弹出窗口
+        $('#myModal').modal('show');
+        document.getElementById('notice').play();
+    }
+    websocket.onerror = function () {
+        alert('websocket通信发生错误');
+    }
+
+    websocket.onbeforeunload = function () {
+        websocket.close();
+    }
+</script>
+
+</body>
+</html>

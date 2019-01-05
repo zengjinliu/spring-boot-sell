@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>订单详情</title>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/3.0.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-4 column">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>商品id</th>
+                    <th>总价</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td th:text="${orderDTO.getOrderId()}">1</td>
+                    <td th:text="${orderDTO.getOrderAmount()}">TB - Monthly</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-12 column">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>商品id</th>
+                    <th>商品名称</th>
+                    <th>价格</th>
+                    <th>数量</th>
+                    <th>总额</th>
+                </tr>
+                </thead>
+
+                <!--订单详情表-->
+                <tbody>
+                <tr th:each=" orderDetailList:${orderDTO.getOrderDetailList()}">
+                    <td th:text="${orderDetailList.getProductId()}"></td>
+                    <td th:text="${orderDetailList.getProductName()}"></td>
+                    <td th:text="${orderDetailList.getProductPrice()}"></td>
+                    <td th:text="${orderDetailList.getProductQuantity()}"></td>
+                    <td th:text="${orderDetailList.getProductQuantity()*orderDetailList.getProductPrice()}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!--按钮-->
+        <div th:class="${orderDTO.getOrderStatusEnum().getMsg()=='新订单'}?'':'hidden'" class="col-md-12 column">
+            <a th:href="@{'/seller/order/finish'(orderId=${orderDTO.getOrderId()})}" type="button" class="btn btn-primary btn-default">完结订单</a>
+            <a th:href="@{'/seller/order/cancel'(orderId=${orderDTO.getOrderId()})}" type="button" class="btn btn-primary btn-danger">取消订单</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

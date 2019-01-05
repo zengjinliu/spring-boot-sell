@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    username: root
+    password: jin0792
+    url: jdbc:mysql://localhost:3306/wechat?characterEncoding=utf-8&useSSL=false
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+  redis:
+    host: localhost
+
+#server:
+#  servlet:
+#    context-path: /spring-boot-sell
+#logging:
+#  level: debug
+server:
+  servlet:
+    context-path: /sell
